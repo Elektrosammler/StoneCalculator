@@ -547,6 +547,34 @@ void fparallel(int** storenames) {
         storenames[inp2 - 1][4] = inp3;
     }
 }
+void fchangebase(int** storenames) {
+    int** storenames2 = storenames1();
+    int count = 0;
+    int count2 = 0;
+    int zp = 0;
+    for (int i = 0; storenames[i][0] == 1; i++) {
+        count++;
+        for (int i = 0; i < 25; i++) {
+            storenames2[0][1] = storenames[storenames[26][0]][i];
+            count2++;
+        }
+    }
+    while (count2 <= count) {
+        zp = storenames[26][0] + count2;
+        if (zp < count) {
+            for (int i = 0; i < 25; i++) {
+                storenames2[0][1] = storenames[zp][i];
+                count2++;
+            }
+        }
+        else if (zp > count)
+            zp = zp - count;
+        for (int i = 0; i < 25; i++) {
+            storenames2[0][1] = storenames[zp][i];
+            count2++;
+        }
+    }
+}
 int fcalculate(int** storenames, double* steingroesse) {
     //std::cout << "1";
 
@@ -556,6 +584,7 @@ int fcalculate(int** storenames, double* steingroesse) {
     short** field = ffield();
     short** storelines = mstorelines(storenames);
     //std::cout << "1.5";
+    fchangebase(storenames);
     calcangles(storenames);
     //std::cout << "2";
     makefigure(field, storenames, storelines);
