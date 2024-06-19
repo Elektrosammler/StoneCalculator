@@ -68,14 +68,23 @@ int*** addstorevals(int*** storevals, int pos, int x, int y, int direct) {
 
 
 }
-void getfirstpop(int*** storevals, int* returnxy, bool pop) {
-    returnxy[0] = storevals[2][1][0];
-    returnxy[2] = storevals[2][1][1];
-    returnxy[2] = storevals[2][1][2];
-    std::cout << "pop \nreturnxy: %i, %i, %i\nstorevals: %i, %i, %i", returnxy [0], returnxy[1], returnxy[2], storevals[2][1][1], storevals[2][1][1], storevals[2][1][2];
-    if (pop == 1) {
-        storevals[0][0][0] = 1;
+bool getfirstpop(int*** storevals, int* returnxy, bool pop) {
+    int count = 2;
+    while (storevals[count][0][0] == 0) {
+        count++;
     }
+    if (count == storevals[0][0][0] + 2) {
+        return 1;
+    }
+    
+    returnxy[0] = storevals[count][1][0];
+    returnxy[1] = storevals[count][1][1];
+    returnxy[2] = storevals[count][1][2];
+    //std::cout << "pop \nreturnxy: %i, %i, %i\nstorevals: %i, %i, %i", returnxy [0], returnxy[1], returnxy[2], storevals[2][1][1], storevals[2][1][1], storevals[2][1][2];
+    if (pop == 1) {
+        storevals[count][0][0] = 1;
+    }
+    return 0;
 }
 int addstone(short** field, int x, int y, double* steingroesse) {
     
@@ -347,10 +356,11 @@ int freihenverband(short** field,int*** storevals,double* steingroesse, int posi
     int stones = 0;
     int zp;
     int x,y,i;
+    bool on = 0;
     //finsidetwo(field);
-    for (i = 0; (posiblestonefield > 0)&&(i < 40000 ); i++) {
+    for (i = 0; (posiblestonefield > 0)&&(i < 40000 )&&(on == 0); i++) {
         
-        getfirstpop(storevals, returnxy, 1);
+        on = getfirstpop(storevals, returnxy, 1);
         zp = addstone(field, returnxy[0], returnxy[1],steingroesse);
         storechecked = arrayadd(storechecked,i, returnxy[0], returnxy[1], returnxy[2]);
         if (i % 10000 == 0) {
@@ -383,21 +393,21 @@ int freihenverband(short** field,int*** storevals,double* steingroesse, int posi
         }
         if (i == 40000) std::cout << "nearly there";
     }
-    std::cout << "\nfinished\n ";
-    while ( true)  {
+    //std::cout << "\nfinished\n ";
+    while (on == 0)  {
         //std::cout << "e";
-        getfirstpop(storevals, returnxy, 1);
+        on =getfirstpop(storevals, returnxy, 1);
         zp = addstone(field, returnxy[0], returnxy[1], steingroesse);
         storechecked = arrayadd(storechecked, i, returnxy[0], returnxy[1], returnxy[2]);
         if (i % 25000 == 0) {
-            std::cout << "posiblestonefield: " << posiblestonefield << "\ni: " << i/1000 << "k\nzp: " << zp << "\n";
-            std::cout << "\nreturnxy[0]: " << returnxy[0] << "\nreturnxy[1]: " << returnxy[1] << "\nreturnxy[2]: " << returnxy[2] << "\n";
+            //std::cout << "posiblestonefield: " << posiblestonefield << "\ni: " << i/1000 << "k\nzp: " << zp << "\n";
+            //std::cout << "\nreturnxy[0]: " << returnxy[0] << "\nreturnxy[1]: " << returnxy[1] << "\nreturnxy[2]: " << returnxy[2] << "\n";
         }
         i++;
     }
     free(storechecked);
-    std::cout << "posiblestonefield: " << posiblestonefield << "\n";
-    std::cout << "stones: " <<stones << "\n";
+    //std::cout << "posiblestonefield: " << posiblestonefield << "\n";
+    //std::cout << "stones: " <<stones << "\n";
     return stones;
 }
 int frechteckverband(short** field, int*** storevals, double* steingroesse, int posiblestonefield, int* returnxy, short** storelines) {
@@ -407,9 +417,11 @@ int frechteckverband(short** field, int*** storevals, double* steingroesse, int 
     bool direct;
     int y;
     int x;
+    int i;
+    bool on = 0;
     //finsidetwo(field);
-    for (int i = 0; posiblestonefield > 0; i++) {
-        getfirstpop(storevals, returnxy, 1);
+    for ( i = 0; (posiblestonefield > 0) && (i < 40000) && (on == 0); i++) {
+        on = getfirstpop(storevals, returnxy, 1);
         if (returnxy[2] == 0) {
             zp = addstone(field, returnxy[0], returnxy[1], steingroesse);
             direct = 0;
@@ -503,6 +515,18 @@ int frechteckverband(short** field, int*** storevals, double* steingroesse, int 
             }
         }
     }
+    while (on == 0) {
+        //std::cout << "e";
+        on = getfirstpop(storevals, returnxy, 1);
+        zp = addstone(field, returnxy[0], returnxy[1], steingroesse);
+        storechecked = arrayadd(storechecked, i, returnxy[0], returnxy[1], returnxy[2]);
+        if (i % 25000 == 0) {
+            //std::cout << "posiblestonefield: " << posiblestonefield << "\ni: " << i/1000 << "k\nzp: " << zp << "\n";
+            //std::cout << "\nreturnxy[0]: " << returnxy[0] << "\nreturnxy[1]: " << returnxy[1] << "\nreturnxy[2]: " << returnxy[2] << "\n";
+        }
+        i++;
+    }
+    free(storechecked);
     return stones;
 }
 int countstones(short** field, int** storenames, short** storelines, double* steingroesse) {
@@ -622,7 +646,7 @@ int main() {
     bool end = 0;
     bool* ptrend = &end;
     int counteradd = 0;
-    bool dev = 1;
+    bool dev = 0;
     if(dev == 1){
         for (int i = 0; i < 4; i++){
             storenames[i][0] = 1;
